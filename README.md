@@ -1,172 +1,400 @@
-# Security Timeline Analysis Suite (STAS)
+# STAS: Security Timeline Analysis Suite
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C++17](https://img.shields.io/badge/C++-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/downloads/)
+[![Cross-Platform](https://img.shields.io/badge/Linux%20%26%20Windows-Ready-brightgreen.svg)](#cross-platform-support)
 
-**A hybrid static + dynamic + behavioral malware analysis platform** with automated timeline reconstruction, risk scoring, graphing, and a beautiful dark-mode dashboard.
+**Enterprise malware analysis platform** combining high-performance C++ static analysis with AI-powered behavioral intelligence, threat correlation, and automated detection rules. Built for security operations, threat intelligence teams, and incident responders.
 
-STAS combines a high-performance C++ analysis engine with a modern PyQt6 Python GUI to deliver a powerful, local, open-source malware analysis tool.
+**What makes STAS different:** While most tools focus on *analyzing* one malware sample, STAS connects the dots across entire campaigns. It correlates infrastructure, detects code reuse, generates detection rules, and tells you who's behind the attack—all from local, open-source analysis.
 
-## Features
+---
 
+## ✨ What You Get
 
-### Core Engine (C++)
-- **Static Analysis**
-  - MD5, SHA1, SHA256 hashing
-  - Entropy calculation (packed/encrypted detection)
-  - PE header parsing (imports, exports, sections, TLS callbacks)
-  - String extraction
-  - Packer detection (UPX, ASPack, etc.)
-  - YARA rule scanning (custom + community rules)
-- **Dynamic Timeline (Simulated / Extensible)**
-  - Process, file, registry, network events
-  - Timestamped and sequenced
-  - Persistence detection (Run keys, services, etc.)
-- **SQLite Event Storage**
-  - Full timeline exportable to JSON/HTML
-- **Risk Scoring Engine**
-  - Rule-based + ML-ready scoring (0–100)
-  - Categories: Stealth, Persistence, Propagation, Exfiltration
-- **MITRE ATT&CK Mapping**
-  - Data-driven JSON rules for import and behavioral-event combinations
-  - STIX 2.1 `attack-pattern` bundle output
-  - Default rules in `data/attack_rules.json`
+### **C++ Engine: Fast Static + Dynamic Analysis**
 
-### Dashboard (Python + PyQt6)
-- Dark-mode fluent UI
-- Live event feed (real-time updates)
-- Timeline visualization
-- Risk score panel with color coding
-- Static analysis summary
-- Event filtering by type/severity
-- Export reports (JSON, HTML, Markdown)
-- Built-in SQLite browser
+- **Static Analysis:** PE parsing, entropy per-section, import extraction, packer detection, YARA scanning
+- **Dynamic Timeline:** Simulated process/file/registry/network events with timestamps
+- **MITRE ATT&CK Mapping:** Automatic technique inference from imports + behaviors
+- **IOC Extraction:** Networks, domains, URLs, credentials, crypto wallets, file paths, registry keys—all with confidence scoring
+- **Import Profiling:** Categorizes imports (MEMORY, NETWORK, PERSISTENCE, etc.) and predicts malware archetype (RAT, Ransomware, Loader, etc.)
+- **Risk Scoring:** Contextual scoring across stealth, persistence, propagation, exfiltration dimensions
+- **SQLite Storage:** Full event timeline exportable to JSON/HTML
 
-## Screenshots
+### **AI-Powered Analytics Layer (Python)**
 
-![STAS Dashboard](<img width="960" height="514" alt="P1" src="https://github.com/user-attachments/assets/0678d3e5-b666-42ab-ae79-d0718d7b8661" />
-)
+- **Behavior Clustering:** DBSCAN/HDBSCAN to find similar samples; Isolation Forest anomaly detection
+- **Malware Family Recognition:** Pre-trained similarity engine for Emotet, Ryuk, Cobalt Strike, Mimikatz, Metasploit, AsyncRAT, RedLine, AgentTesla, Formbook + custom families
+- **Campaign Correlation:** NetworkX-based threat actor campaign detection using weighted signals (shared C2, mutexes, imports, ATT&CK combos, timestamps)
+- **Threat Intelligence Enrichment:** Async IOC enrichment against VirusTotal, MalwareBazaar, URLhaus, AbuseIPDB, ThreatFox with 24hr caching
+- **AI Analyst Reports:** Claude-powered narrative generation—structured executive summaries, technical analysis, attribution hints, all evidence-based
+- **Detection Rule Auto-Generation:** YARA rules (with imphash, entropy, strings) + Sigma rules (Sysmon-compatible) from analysis results
 
-## Quick Start
+### **Beautiful Dark-Mode Dashboard (PyQt6)**
 
-### Prerequisites
-- Windows 10/11 (64-bit)
-- Visual Studio 2022 (Community OK) with C++ desktop development
-- Python 3.10+ 
-- Git
+- **Interactive Timeline Widget:** CrowdStrike-inspired event viewer with:
+  - Collapsible event grouping (by process or time window)
+  - Real-time search/filter (process, type, severity, ATT&CK technique)
+  - Clickable ATT&CK badges linking to MITRE
+  - Lazy-load rendering for 10k+ events
+  - Export selected events to JSON/Markdown
+  - "Jump to Suspicious" smart navigation
 
-### Build & Run
+- **Campaign Graph:** Interactive vis.js network showing correlated samples
+  - Color-coded by campaign, family, or risk score
+  - Hover edges to see correlation signals
+  - Click nodes to inspect sample details
+  - Export to STIX 2.1 or MISP for team collaboration
 
-1. Clone the repo
+- **Unified Risk Dashboard:** Overview of family predictions, behavioral archetypes, anomaly scores, novelty signals
+
+---
+
+## 🚀 Quick Start
+
+### **Prerequisites**
+
+- **Linux:** `build-essential`, `cmake`, `nlohmann-json3-dev`, `libsqlite3-dev` (optional: `libssl-dev`, `libyara-dev`)
+- **Windows:** Visual Studio 2022, vcpkg with `nlohmann-json`, `sqlite3`, `openssl`, `yara`
+- **Python 3.10+**
+
+### **Build & Run (Linux)**
+
 ```bash
+# Clone and enter repo
 git clone https://github.com/AbdulNafaySarmad1/STAS-Security-Timeline-Security-Suite-
 cd STAS
-```
 
-Cross-platform C++ build
-
-Linux:
-
-```bash
+# Install C++ dependencies
 sudo apt install build-essential cmake nlohmann-json3-dev libsqlite3-dev
-# Optional: libssl-dev libyara-dev
+
+# Optional threat intel & visualization features
+sudo apt install libssl-dev libyara-dev
+
+# Build engine
 cmake -S . -B build-linux
-cmake --build build-linux -j
-./build-linux/stas_engine ./dummy_test.exe
+cmake --build build-linux -j$(nproc)
+
+# Install Python environment
+cd src/python
+pip install -r ../../requirements.txt --break-system-packages
+
+# Run dashboard
+python dashboard.py
 ```
 
-Windows:
+### **Build & Run (Windows)**
 
 ```powershell
+# Install vcpkg packages
 vcpkg install nlohmann-json sqlite3 openssl yara
+
+# Build with CMake
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
-.\build\Release\stas_engine.exe .\dummy_test.exe
+
+# Run dashboard from Python directory
+cd src\python
+python dashboard.py
 ```
 
-Optional CMake switches:
+### **Configure API Keys (Optional)**
+
+Copy config templates and add your keys:
 
 ```bash
-cmake -S . -B build -DSTAS_ENABLE_SQLITE=OFF -DSTAS_ENABLE_YARA=OFF -DSTAS_ENABLE_OPENSSL=OFF
+# Threat Intelligence Enrichment
+cp data/threat_intel_config.example.json data/threat_intel_config.json
+# Add VirusTotal and AbuseIPDB keys, or use environment variables:
+export VT_API_KEY="your_key"
+export ABUSEIPDB_API_KEY="your_key"
+
+# AI Analyst Reports
+cp data/ai_analyst_config.example.json data/ai_analyst_config.json
+# Add Anthropic API key:
+export ANTHROPIC_API_KEY="your_key"
 ```
 
-Build the C++ engine
+### **Analyze a Sample**
 
-Bash# Open "x64 Native Tools Command Prompt for VS 2022"
-mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release
+```bash
+# Analyze with C++ engine
+./build-linux/stas_engine ./malware_sample.exe
 
-Install Python dependencies & run dashboard
+# Open dashboard to explore results
+python src/python/dashboard.py
+```
 
-Bashcd ../src/python
-pip install pyqt6 pyinstaller graphviz pandas sqlite3
-python dashboard.py
+---
 
-Analyze a sample
+## 📊 Core Modules
 
-Bashcd ../../build/Release
-stas_engine.exe ../../../test_sample.exe
+### **C++ (src/cpp/)**
 
-Switch back to dashboard — events appear live!
+| Module | Purpose |
+|--------|---------|
+| `static_analysis.cpp` | PE parsing, entropy, imports, packer detection, YARA integration |
+| `dynamic_timeline.cpp` | Process/file/registry/network event simulation |
+| `attack_mapper.cpp` | MITRE ATT&CK technique inference from imports + behaviors |
+| `import_profiler.cpp` | Import categorization + behavioral archetype prediction |
+| `ioc_extractor.cpp` | Domain, IP, URL, credential, crypto IOC extraction with regex + heuristics |
+| `risk_scoring.cpp` | Contextual risk scoring across threat dimensions |
+| `sqlite_db.cpp` | Event timeline persistence |
 
-Standalone Executables (Optional)
-Bash# Engine is already built as stas_engine.exe
+### **Python Analytics (src/python/)**
 
-# Dashboard standalone
-cd ../src/python
-pyinstaller --onefile --windowed --name STAS_Dashboard dashboard.py
-# → dist/STAS_Dashboard.exe
-Project Structure
-text
+| Module | Purpose |
+|--------|---------|
+| `timeline_widget.py` | Interactive PyQt6 event timeline UI |
+| `behavior_analyzer.py` | Malware family similarity, clustering, anomaly detection |
+| `campaign_correlation.py` | NetworkX campaign detection via weighted signal correlation |
+| `threat_intel_enricher.py` | Async IOC enrichment (VT, MalwareBazaar, URLhaus, AbuseIPDB, ThreatFox) with SQLite caching |
+| `ai_analyst_narrator.py` | Claude-powered structured threat report generation |
+| `detection_rule_generator.py` | YARA + Sigma + MISP IOC report auto-generation |
+| `dashboard.py` | Main PyQt6 dashboard |
+
+---
+
+## 🔧 Advanced Features
+
+### **Cross-Platform Support**
+
+STAS builds natively on **Linux and Windows**. Optional dependencies (YARA, OpenSSL, SQLite) are detected at build time; the engine gracefully degrades if libraries are unavailable.
+
+```bash
+# Minimal Linux build (no optional deps)
+cmake -S . -B build -DSTAS_ENABLE_YARA=OFF -DSTAS_ENABLE_OPENSSL=OFF -DSTAS_ENABLE_SQLITE=OFF
+cmake --build build -j
+```
+
+### **Campaign Correlation**
+
+Detect threat actor campaigns from multiple samples using weighted signals:
+
+```python
+from campaign_correlation import CampaignGraph
+
+graph = CampaignGraph("data/campaign.db")
+graph.build_graph(samples)  # Correlate shared C2, mutexes, imports, families
+campaigns = graph.detect_campaigns()  # Louvain community detection
+
+# Export for team collaboration
+graph.export_html_graph("campaign_viz.html", color_by="campaign")
+stix_bundle = graph.export_stix(campaigns)
+misp_events = graph.export_misp(campaigns)
+```
+
+### **Threat Intelligence Enrichment**
+
+Async IOC lookups with intelligent caching:
+
+```python
+import asyncio
+from threat_intel_enricher import ThreatIntelEnricher
+
+async def enrich():
+    enricher = ThreatIntelEnricher()
+    results = await enricher.enrich_iocs([
+        {"value": "8.8.8.8", "type": "IPV4"},
+        {"value": "malware.example.com", "type": "DOMAIN"},
+    ])
+    
+    for result in results:
+        print(f"{result.ioc_value}: {result.aggregate_verdict} ({result.aggregate_score}/100)")
+        print(f"  Sources: {[s.name for s in result.sources]}")
+
+asyncio.run(enrich())
+```
+
+### **AI-Powered Threat Reports**
+
+Generate analyst-grade narratives with Claude:
+
+```python
+from ai_analyst_narrator import AIAnalystNarrator
+
+narrator = AIAnalystNarrator()
+report = narrator.generate_report(analysis_json)
+
+print(report.executive_summary)
+print(report.technical_analysis)
+print(report.markdown)  # Full Markdown report
+```
+
+### **Auto-Generate Detection Rules**
+
+Create YARA, Sigma, and MISP from analysis:
+
+```python
+from detection_rule_generator import DetectionRuleGenerator
+
+gen = DetectionRuleGenerator()
+yara_rule = gen.generate_yara(analysis)
+sigma_rule = gen.generate_sigma(analysis)
+ioc_report = gen.generate_ioc_report(analysis)
+```
+
+---
+
+## 📁 Project Structure
+
+```
 STAS/
-├── build/                  # CMake build output
+├── build/                    # CMake build output
 ├── src/
-│   ├── cpp/                # Core engine (static, dynamic, SQLite, scoring)
-│   └── python/             # PyQt6 dashboard + anomaly detection
-├── data/                   # ML baseline, YARA rules
-├── events.db               # Generated analysis database
-├── dummy_test.exe          # Example test file
+│   ├── cpp/                  # C++17 analysis engine
+│   │   ├── static_analysis.cpp
+│   │   ├── attack_mapper.cpp
+│   │   ├── import_profiler.cpp
+│   │   ├── ioc_extractor.cpp
+│   │   ├── pe_structs.h      # Portable PE parsing (no Windows.h)
+│   │   └── ...
+│   └── python/               # Python analytics & UI
+│       ├── dashboard.py      # PyQt6 main window
+│       ├── timeline_widget.py
+│       ├── behavior_analyzer.py
+│       ├── campaign_correlation.py
+│       ├── threat_intel_enricher.py
+│       ├── ai_analyst_narrator.py
+│       ├── detection_rule_generator.py
+│       └── requirements.txt
+├── data/                     # Config templates & rules
+│   ├── attack_rules.json
+│   ├── import_capability_rules.json
+│   ├── threat_intel_config.example.json
+│   └── ai_analyst_config.example.json
+├── CMakeLists.txt            # Cross-platform build config
 └── README.md
-Future Roadmap (Bonus Features Ready to Add)
+```
 
-Real API hooking via MinHook
-GraphViz process/file/network graphs
-scikit-learn anomaly detection (clustering/families)
-LLM-powered behavioral narration
-Full sandbox with suspended process + remote thread injection
-Memory dump + string extraction
-REST API server mode
+---
 
-MITRE ATT&CK Rule Format
+## 🎯 Use Cases
 
-Rules live in `data/attack_rules.json` and are loaded by the C++ engine at runtime. `imports` and `behaviors` are ANDed together; each item supports exact matching or `*` wildcards.
+**Security Operations:** Monitor malware behavior in real-time with interactive timelines. Flag suspicious patterns instantly.
+
+**Threat Intelligence:** Correlate malware samples to identify APT campaigns. Export campaign profiles to STIX/MISP for team sharing.
+
+**Incident Response:** Generate analyst-ready threat reports in seconds. Know the malware family, capabilities, and TTPs immediately.
+
+**Malware Research:** Cluster similar samples. Detect code reuse. Generate detection rules for Yara/Sigma/MISP.
+
+**Compliance & Threat Hunting:** Export structured IOCs for SOC ingestion. Benchmark against known families and techniques.
+
+---
+
+## 📊 Malware Families Supported
+
+Pre-trained similarity profiles for:
+- **Emotet** (Loader)
+- **Ryuk** (Ransomware)
+- **Cobalt Strike** (Backdoor)
+- **Mimikatz** (Credential Stealer)
+- **Metasploit** (Backdoor)
+- **AsyncRAT** (RAT)
+- **RedLine** (Stealer)
+- **AgentTesla** (Stealer)
+- **Formbook** (Stealer)
+
+Add custom families via `behavior_analyzer.py`.
+
+---
+
+## 🛠️ Configuration
+
+### **Threat Intel APIs**
+
+Copy and edit `data/threat_intel_config.example.json`:
 
 ```json
 {
-  "id": "T1055",
-  "name": "Process Injection",
-  "tactic": "Defense Evasion",
-  "confidence": 0.9,
-  "imports": ["VirtualAlloc", "WriteProcessMemory", "CreateRemoteThread"],
-  "behaviors": []
+  "api_keys": {
+    "virustotal": "your_vt_key",
+    "abuseipdb": "your_abuseipdb_key"
+  },
+  "rate_limits": {
+    "VirusTotal": 16.0,
+    "MalwareBazaar": 1.0,
+    "URLhaus": 1.0,
+    "AbuseIPDB": 2.0,
+    "ThreatFox": 1.0
+  }
 }
 ```
 
-Contributing
-Pull requests are welcome! Especially:
+### **AI Analyst Reports**
 
-Real dynamic hooking modules
-YARA rule contributions
-UI enhancements
-ML model improvements
+Copy and edit `data/ai_analyst_config.example.json`:
 
-License
-MIT License — feel free to use, modify, and distribute.
+```json
+{
+  "anthropic_api_key": "your_claude_key",
+  "model": "claude-sonnet-4-6",
+  "timeout_seconds": 90,
+  "max_retries": 3,
+  "max_tokens": 5000
+}
+```
 
-STAS — Because your malware deserves a timeline.
-Built with 🔥 by Abdul Nafay Sarmad — December 2025
+---
 
+## 📦 Dependencies
 
+**C++ (Optional):**
+- `nlohmann/json` – JSON I/O
+- `SQLite3` – Event storage
+- `OpenSSL` – Hashing (fallback to std lib)
+- `YARA` – Malware rule scanning
 
+**Python:**
+- `PyQt6` – Desktop GUI
+- `aiohttp` – Async HTTP for threat intel
+- `networkx` – Campaign graph detection
+- `scikit-learn` – Anomaly detection & clustering
+- `pandas`, `numpy` – Data analysis
+- `Jinja2` – Detection rule templating
+- `pyvis` – Interactive graph visualization
+
+Install all:
+```bash
+pip install -r src/python/requirements.txt --break-system-packages
+```
+
+---
+
+## 🚀 Contributing
+
+PRs welcome! Areas that need love:
+- Real API hooking via MinHook (dynamic analysis)
+- Memory dump + string extraction
+- Full sandbox process suspension
+- Additional malware family profiles
+- YARA rule contributions
+- UI/UX enhancements
+
+---
+
+## 📄 License
+
+MIT License – free to use, modify, and distribute.
+
+---
+
+## 👨‍💻 Built By
+
+**Abdul Nafay Sarmad** | 
+
+First-year CS student at SSUET, building enterprise malware analysis tools.
+
+---
+
+## 🔗 Quick Links
+
+- [MITRE ATT&CK](https://attack.mitre.org/) – Technique reference
+- [Sigma Rules](https://github.com/SigmaHQ/sigma) – Detection rules
+- [STIX 2.1](https://oasis-open.github.io/cti-documentation/stix/intro) – Threat info sharing
+- [MISP](https://www.misp-project.org/) – Threat intel platform
+- [VirusTotal](https://www.virustotal.com/) – File scanning
+- [YARA](https://virustotal.github.io/yara/) – Malware rules
