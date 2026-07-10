@@ -119,7 +119,8 @@ cd ../src/python
 pyinstaller --onefile --windowed --name STAS_Dashboard dashboard.py
 # → dist/STAS_Dashboard.exe
 Project Structure
-textSTAS/
+text
+STAS/
 ├── build/                  # CMake build output
 ├── src/
 │   ├── cpp/                # Core engine (static, dynamic, SQLite, scoring)
