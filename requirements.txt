@@ -5,3 +5,8 @@ joblib
 graphviz
 sqlite3
 PyQt6
+aiohttp
+Jinja2
+networkx
+matplotlib
+pyvis

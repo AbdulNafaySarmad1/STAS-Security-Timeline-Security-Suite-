@@ -1,8 +1,13 @@
 #include "sqlite_db.h"
+
+#ifdef STAS_WITH_SQLITE
 #include <sqlite3.h>
+#endif
+
 #include <iostream>
 
 SQLiteDB::SQLiteDB(const std::string& dbfile) {
+#ifdef STAS_WITH_SQLITE
     int rc = sqlite3_open(dbfile.c_str(), &db);
     if (rc != SQLITE_OK) {
         std::cerr << "Cannot open database " << dbfile << ": " << sqlite3_errmsg(db) << std::endl;
@@ -10,9 +15,14 @@ SQLiteDB::SQLiteDB(const std::string& dbfile) {
     } else {
         std::cout << "Database " << dbfile << " opened successfully" << std::endl;
     }
+#else
+    db = nullptr;
+    std::cout << "SQLite support is disabled; not opening " << dbfile << std::endl;
+#endif
 }
 
 void SQLiteDB::storeEvents(const std::vector<Event>& events) {
+#ifdef STAS_WITH_SQLITE
     if (!db) {
         std::cerr << "Database not open!" << std::endl;
         return;
@@ -54,11 +64,17 @@ void SQLiteDB::storeEvents(const std::vector<Event>& events) {
 
     sqlite3_finalize(stmt);
     std::cout << "Saved " << events.size() << " events to database" << std::endl;
+#else
+    std::cout << "SQLite support is disabled; skipped storing "
+              << events.size() << " events" << std::endl;
+#endif
 }
 
 SQLiteDB::~SQLiteDB() {
+#ifdef STAS_WITH_SQLITE
     if (db) {
         sqlite3_close(db);
         std::cout << "Database closed" << std::endl;
     }
+#endif
 }

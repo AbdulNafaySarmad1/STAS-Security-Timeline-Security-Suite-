@@ -1,13 +1,13 @@
 #ifndef DYNAMIC_TIMELINE_H
 #define DYNAMIC_TIMELINE_H
 
+#include <cstdint>
 #include <vector>
 #include <string>
-#include <windows.h>  // For GetTickCount64()
 
 struct Event {
     std::string type;
-    unsigned long timestamp;
+    std::uint64_t timestamp;
     // Add more fields later if needed (pid, details, etc.)
 };
 

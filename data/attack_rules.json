@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "id": "T1055",
+      "name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "confidence": 0.9,
+      "imports": [
+        "VirtualAlloc",
+        "WriteProcessMemory",
+        "CreateRemoteThread"
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "T1547.001",
+      "name": "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder",
+      "tactic": "Persistence",
+      "confidence": 0.92,
+      "imports": [
+        "RegOpenKey*",
+        "RegSetValue*"
+      ],
+      "behaviors": [
+        "*HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run*"
+      ]
+    },
+    {
+      "id": "T1071",
+      "name": "Application Layer Protocol",
+      "tactic": "Command and Control",
+      "confidence": 0.75,
+      "imports": [
+        "WinHttp*"
+      ],
+      "behaviors": [
+        "network_indicator:*"
+      ]
+    },
+    {
+      "id": "T1071",
+      "name": "Application Layer Protocol",
+      "tactic": "Command and Control",
+      "confidence": 0.75,
+      "imports": [
+        "WSAStartup"
+      ],
+      "behaviors": [
+        "network_indicator:*"
+      ]
+    },
+    {
+      "id": "T1027",
+      "name": "Obfuscated Files or Information",
+      "tactic": "Defense Evasion",
+      "confidence": 0.8,
+      "imports": [
+        "CryptAcquireContext*",
+        "CryptEncrypt"
+      ],
+      "behaviors": []
+    },
+    {
+      "id": "T1543.003",
+      "name": "Create or Modify System Process: Windows Service",
+      "tactic": "Persistence",
+      "confidence": 0.88,
+      "imports": [
+        "CreateService*",
+        "StartService*"
+      ],
+      "behaviors": []
+    }
+  ]
+}

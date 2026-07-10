@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "categories": [
+    {
+      "category": "MEMORY",
+      "risk_contribution": 7,
+      "imports": [
+        "VirtualAlloc",
+        "VirtualProtect",
+        "HeapAlloc",
+        "VirtualAllocEx",
+        "NtAllocateVirtualMemory",
+        "RtlAllocateHeap"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "risk_contribution": 7,
+      "imports": [
+        "WinHttpOpen",
+        "InternetOpen",
+        "socket",
+        "connect",
+        "WSAStartup",
+        "HttpSendRequest",
+        "URLDownloadToFile"
+      ]
+    },
+    {
+      "category": "REGISTRY",
+      "risk_contribution": 6,
+      "imports": [
+        "RegOpenKeyEx",
+        "RegSetValueEx",
+        "RegCreateKeyEx",
+        "RegDeleteKey",
+        "NtSetValueKey"
+      ]
+    },
+    {
+      "category": "CRYPTO",
+      "risk_contribution": 8,
+      "imports": [
+        "CryptAcquireContext",
+        "CryptEncrypt",
+        "CryptDecrypt",
+        "CryptHashData",
+        "BCryptEncrypt",
+        "RtlEncryptMemory"
+      ]
+    },
+    {
+      "category": "PERSISTENCE",
+      "risk_contribution": 8,
+      "imports": [
+        "CreateService",
+        "StartService",
+        "SchRpcRegisterTask",
+        "WTSRegisterSessionNotification"
+      ]
+    },
+    {
+      "category": "PROCESS_INJECTION",
+      "risk_contribution": 10,
+      "imports": [
+        "CreateRemoteThread",
+        "WriteProcessMemory",
+        "NtQueueApcThread",
+        "RtlCreateUserThread",
+        "NtCreateThreadEx"
+      ]
+    },
+    {
+      "category": "EVASION",
+      "risk_contribution": 8,
+      "imports": [
+        "IsDebuggerPresent",
+        "CheckRemoteDebuggerPresent",
+        "NtQueryInformationProcess",
+        "GetTickCount",
+        "Sleep",
+        "CreateTimerQueueTimer"
+      ]
+    },
+    {
+      "category": "KEYLOGGING",
+      "risk_contribution": 9,
+      "imports": [
+        "SetWindowsHookEx",
+        "GetAsyncKeyState",
+        "GetKeyState"
+      ]
+    },
+    {
+      "category": "SCREENSHOT",
+      "risk_contribution": 8,
+      "imports": [
+        "BitBlt",
+        "GetDC",
+        "CreateCompatibleBitmap"
+      ]
+    },
+    {
+      "category": "FILE_OPS",
+      "risk_contribution": 5,
+      "imports": [
+        "CreateFileW",
+        "DeleteFileW",
+        "MoveFileEx",
+        "CopyFileEx"
+      ]
+    }
+  ],
+  "behavior_predictions": [
+    {
+      "required_categories": [
+        "KEYLOGGING",
+        "SCREENSHOT",
+        "NETWORK"
+      ],
+      "prediction": "Likely spyware/RAT",
+      "priority": 100
+    },
+    {
+      "required_categories": [
+        "CRYPTO",
+        "NETWORK",
+        "FILE_OPS"
+      ],
+      "prediction": "Possible ransomware or data exfiltration",
+      "priority": 90
+    },
+    {
+      "required_categories": [
+        "MEMORY",
+        "PROCESS_INJECTION"
+      ],
+      "prediction": "Likely performs code injection into remote process",
+      "priority": 80
+    },
+    {
+      "required_categories": [
+        "PERSISTENCE",
+        "REGISTRY"
+      ],
+      "prediction": "Likely establishes persistence through services, tasks, or registry changes",
+      "priority": 70
+    },
+    {
+      "required_categories": [
+        "EVASION",
+        "MEMORY"
+      ],
+      "prediction": "Likely uses anti-analysis checks with dynamic memory staging",
+      "priority": 60
+    },
+    {
+      "required_categories": [
+        "NETWORK",
+        "FILE_OPS"
+      ],
+      "prediction": "Likely downloads, uploads, or stages files over the network",
+      "priority": 50
+    }
+  ]
+}

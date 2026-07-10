@@ -28,6 +28,10 @@ STAS combines a high-performance C++ analysis engine with a modern PyQt6 Python 
 - **Risk Scoring Engine**
   - Rule-based + ML-ready scoring (0–100)
   - Categories: Stealth, Persistence, Propagation, Exfiltration
+- **MITRE ATT&CK Mapping**
+  - Data-driven JSON rules for import and behavioral-event combinations
+  - STIX 2.1 `attack-pattern` bundle output
+  - Default rules in `data/attack_rules.json`
 
 ### Dashboard (Python + PyQt6)
 - Dark-mode fluent UI
@@ -58,6 +62,34 @@ STAS combines a high-performance C++ analysis engine with a modern PyQt6 Python 
 ```bash
 git clone https://github.com/AbdulNafaySarmad1/STAS-Security-Timeline-Security-Suite-
 cd STAS
+```
+
+Cross-platform C++ build
+
+Linux:
+
+```bash
+sudo apt install build-essential cmake nlohmann-json3-dev libsqlite3-dev
+# Optional: libssl-dev libyara-dev
+cmake -S . -B build-linux
+cmake --build build-linux -j
+./build-linux/stas_engine ./dummy_test.exe
+```
+
+Windows:
+
+```powershell
+vcpkg install nlohmann-json sqlite3 openssl yara
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release
+.\build\Release\stas_engine.exe .\dummy_test.exe
+```
+
+Optional CMake switches:
+
+```bash
+cmake -S . -B build -DSTAS_ENABLE_SQLITE=OFF -DSTAS_ENABLE_YARA=OFF -DSTAS_ENABLE_OPENSSL=OFF
+```
 
 Build the C++ engine
 
@@ -105,6 +137,21 @@ LLM-powered behavioral narration
 Full sandbox with suspended process + remote thread injection
 Memory dump + string extraction
 REST API server mode
+
+MITRE ATT&CK Rule Format
+
+Rules live in `data/attack_rules.json` and are loaded by the C++ engine at runtime. `imports` and `behaviors` are ANDed together; each item supports exact matching or `*` wildcards.
+
+```json
+{
+  "id": "T1055",
+  "name": "Process Injection",
+  "tactic": "Defense Evasion",
+  "confidence": 0.9,
+  "imports": ["VirtualAlloc", "WriteProcessMemory", "CreateRemoteThread"],
+  "behaviors": []
+}
+```
 
 Contributing
 Pull requests are welcome! Especially:

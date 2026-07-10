@@ -1,0 +1,13 @@
+{
+  "api_keys": {
+    "virustotal": "",
+    "abuseipdb": ""
+  },
+  "rate_limits": {
+    "VirusTotal": 16.0,
+    "MalwareBazaar": 1.0,
+    "URLhaus": 1.0,
+    "AbuseIPDB": 2.0,
+    "ThreatFox": 1.0
+  }
+}
