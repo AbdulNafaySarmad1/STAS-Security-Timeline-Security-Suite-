@@ -1,3 +1,5 @@
+<p align="center"><img src="stas.jpeg" width="200"></p>
+
 # STAS: Security Timeline Analysis Suite
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
